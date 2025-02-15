@@ -1,0 +1,93 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package com.example.tourismchat1
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.tourismchat1.navigation.NavGraph
+import com.example.tourismchat1.data.models.TouristPlace
+import com.example.tourismchat1.ui.theme.TourismChat1Theme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            TourismChat1Theme {
+                val navController = rememberNavController()
+                NavGraph(navController = navController)
+            }
+        }
+    }
+}
+
+@Composable
+fun AttractionsScreen(navController: NavHostController) {
+    val attractions = remember { mutableStateListOf<TouristPlace>() }
+
+    LaunchedEffect(Unit) {
+        try {
+            val response = RetrofitInstance.api.getAttractions()
+            attractions.addAll(response)
+        } catch (e: Exception) {
+            println("Error fetching attractions: ${e.message}")
+        }
+    }
+
+    Scaffold(topBar = { TopAppBar(title = { Text("Attractions") }) }) {
+        Column(modifier = Modifier.padding(it).fillMaxSize()) {
+            attractions.forEach { place ->
+                Card(modifier = Modifier.padding(8.dp), shape = RoundedCornerShape(10.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(text = place.name, fontSize = 20.sp, color = Color.Blue)
+                        Text(text = place.location, fontSize = 16.sp)
+                        Text(text = place.description, fontSize = 14.sp)
+                    }
+                }
+            }
+            Button(onClick = { navController.popBackStack() }, shape = RoundedCornerShape(10.dp)) {
+                Text("Back")
+            }
+        }
+    }
+}
+
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    TourismChat1Theme {
+        Greeting("Android")
+    }
+}
+
