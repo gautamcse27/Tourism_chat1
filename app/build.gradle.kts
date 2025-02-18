@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation ("io.coil-kt:coil-compose:2.2.2")
+    implementation (libs.coil.compose)
     implementation(libs.converter.gson)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.material3)
