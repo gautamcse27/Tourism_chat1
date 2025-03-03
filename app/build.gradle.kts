@@ -40,7 +40,11 @@ android {
 }
 
 dependencies {
-    implementation ("io.coil-kt:coil-compose:2.2.2")
+    implementation(libs.androidx.material.icons.extended)
+    implementation (libs.play.services.maps)
+    implementation (libs.maps.compose)
+    implementation (libs.google.accompanist.pager)
+    implementation (libs.coil.compose)
     implementation (libs.coil.compose)
     implementation(libs.converter.gson)
     implementation(libs.androidx.navigation.compose)

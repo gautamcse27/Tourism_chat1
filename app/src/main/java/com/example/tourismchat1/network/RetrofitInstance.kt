@@ -1,5 +1,6 @@
+package com.example.tourismchat1.network
 
-
+import TourismApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {

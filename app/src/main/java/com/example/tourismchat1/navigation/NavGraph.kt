@@ -4,7 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.tourismapp.ui.screens.*
+import com.example.tourismchat1.screens.*
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.tourismchat1.screens.AttractionDetailsScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -13,6 +16,13 @@ fun NavGraph(navController: NavHostController) {
         composable("attractions") { AttractionsScreen(navController) }
         composable("map") { MapScreen(navController) }
         composable("itinerary") { ItineraryScreen(navController) }
-        composable("profile") { ProfileScreen(navController) }
+        composable("about") { About(navController) }
+        composable(
+            route = "attraction_details/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")
+            AttractionDetailsScreen(navController, id)
+        }
     }
 }

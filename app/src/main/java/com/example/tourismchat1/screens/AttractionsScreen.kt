@@ -1,4 +1,7 @@
-package com.example.tourismapp.ui.screens
+package com.example.tourismchat1.screens
+import com.example.tourismchat1.components.ImageSlider
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,21 +13,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-
-import com.example.tourismchat1.data.models.TouristPlace
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import com.example.tourismchat1.R
+import com.example.tourismchat1.data.models.TouristPlace
+import com.example.tourismchat1.network.RetrofitInstance
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.painterResource
+import com.google.accompanist.pager.*
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun AttractionsScreen(navController: NavHostController) {
     val attractions = remember { mutableStateListOf<TouristPlace>() }
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
     // Fetch attractions from API
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
@@ -40,28 +45,25 @@ fun AttractionsScreen(navController: NavHostController) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Attractions") }) },
-                bottomBar = {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Text("Back")
+        topBar = {
+            TopAppBar(
+                title = { Text("Attractions") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                            contentDescription = "Back"
+                        )
+                    }
                 }
-            }
+            )
         }
-    ) {
-        paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-        )
-        {
+        ) {
             when {
                 isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.padding(16.dp))
@@ -79,20 +81,13 @@ fun AttractionsScreen(navController: NavHostController) {
                             Card(
                                 modifier = Modifier
                                     .padding(8.dp)
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .clickable { navController.navigate("attraction_details/${place.id}") },
                                 shape = RoundedCornerShape(10.dp)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
-                                    // Display a default image since the API doesn't provide one
-                                    AsyncImage(
-                                        model = place.image_url, // Remote image URL
-                                        contentDescription = place.name,
-                                        placeholder = painterResource(id = R.drawable.tourism_logo), // While loading
-                                        error = painterResource(id = R.drawable.tourism_logo), // If error occurs
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(200.dp)
-                                    )
+                                    ImageSlider(imageUrls = place.image_urls)
+
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(text = place.name, fontSize = 20.sp, color = Color.Blue)
                                     Text(text = place.location, fontSize = 16.sp)
@@ -103,8 +98,6 @@ fun AttractionsScreen(navController: NavHostController) {
                     }
                 }
             }
-
-
         }
     }
 }

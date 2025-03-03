@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Notebook/Itinerary Shape (Rectangle with top fold) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M4,2h12a2,2 0 0,1 2,2v16a2,2 0 0,1 -2,2h-12a2,2 0 0,1 -2,-2v-16a2,2 0 0,1 2,-2zM6,4v16h10v-16h-10zM8,6h6v2h-6zM8,10h6v2h-6zM8,14h6v2h-6z" />
+
+    <!-- Side Binding (Three small circles) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M18,5a1,1 0 1,1 2,0a1,1 0 1,1 -2,0zM18,11a1,1 0 1,1 2,0a1,1 0 1,1 -2,0zM18,17a1,1 0 1,1 2,0a1,1 0 1,1 -2,0z" />
+</vector>
