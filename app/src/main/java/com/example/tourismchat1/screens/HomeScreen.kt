@@ -2,68 +2,135 @@ package com.example.tourismchat1.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tourismchat1.R
 import kotlinx.coroutines.delay
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val animateProgress by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(5000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+    var isSidebarOpen by remember { mutableStateOf(false) }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val sidebarWidth = screenWidth * 0.5f // Sidebar covers 50% of the screen
+
+    // Offset for main screen movement
+    val mainScreenOffset by animateDpAsState(
+        targetValue = if (isSidebarOpen) sidebarWidth else 0.dp,
+        animationSpec = tween(300)
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Bhojpur District Tourism", color = Color.White) },
+                title = { Text("Bhojpur District", color = Color.White) },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFF00796B)
-                )
+                ),
+                navigationIcon = {
+                    IconButton(onClick = { isSidebarOpen = !isSidebarOpen }) {
+                        Icon(
+                            imageVector = if (isSidebarOpen) Icons.Default.Close else Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = Color.White
+                        )
+                    }
+                },
+                actions = {
+                    Image(
+                        painter = painterResource(id = R.drawable.bihar_tourism_logo),
+                        contentDescription = "Tourism Logo",
+                        modifier = Modifier
+                            .size(40.dp) // Adjust size as needed
+                            .padding(end = 12.dp)
+                    )
+                }
             )
         }
+
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(Color(0xFFF1F8E9), Color(0xFFE1F5FE)),
-                        start = Offset(animateProgress * 1000, animateProgress * 1000),
-                        end = Offset(1000f + animateProgress * 1000, 1000f + animateProgress * 1000)
-                    )
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            // Sidebar Navigation
+            AnimatedVisibility(
+                visible = isSidebarOpen,
+                enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
+                exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut(),
+                modifier = Modifier.width(sidebarWidth)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(sidebarWidth)
+                        .background(Color(0xFF004D40))
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = "Menu",
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        SidebarItem("Home", R.drawable.baseline_home_24) {
+                            navController.navigate("home")
+                            isSidebarOpen = false
+                        }
+                        SidebarItem("About", R.drawable.profile_icon) {
+                            navController.navigate("about")
+                            isSidebarOpen = false
+                        }
+                        SidebarItem("Attractions", R.drawable.baseline_travel_explore_24) {
+                            navController.navigate("attractions")
+                            isSidebarOpen = false
+                        }
+                        SidebarItem("Map", R.drawable.baseline_map_24) {
+                            navController.navigate("map")
+                            isSidebarOpen = false
+                        }
+                        SidebarItem("Itinerary", R.drawable.itinerary_icon) {
+                            navController.navigate("itinerary")
+                            isSidebarOpen = false
+                        }
+                    }
+                }
+            }
+
+            // Dimmed Background when Sidebar is Open
+            if (isSidebarOpen) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                        .clickable { isSidebarOpen = false } // Close when clicking outside
                 )
-        ) {
+            }
+
+            // Main Content (shifts when sidebar is open)
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
+                    .offset(x = mainScreenOffset) // Moves the main screen
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -95,12 +162,12 @@ fun HomeScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // Staggered Buttons
+                // Buttons for Navigation
                 val buttons = listOf(
+                    Triple("About Bhojpur", R.drawable.profile_icon) { navController.navigate("about") },
                     Triple("View Attractions", R.drawable.baseline_travel_explore_24) { navController.navigate("attractions") },
                     Triple("View Map", R.drawable.baseline_map_24) { navController.navigate("map") },
-                    Triple("Itinerary Planner", R.drawable.itinerary_icon) { navController.navigate("itinerary") },
-                    Triple("About Bhojpur", R.drawable.profile_icon) { navController.navigate("about") }
+                    Triple("Itinerary Planner", R.drawable.itinerary_icon) { navController.navigate("itinerary") }
                 )
 
                 buttons.forEachIndexed { index, (text, icon, action) ->
@@ -175,5 +242,24 @@ fun AnimatedButton(text: String, iconResId: Int, onClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun SidebarItem(text: String, iconResId: Int, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = iconResId),
+            contentDescription = text,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(text, fontSize = 18.sp, color = Color.White)
     }
 }
