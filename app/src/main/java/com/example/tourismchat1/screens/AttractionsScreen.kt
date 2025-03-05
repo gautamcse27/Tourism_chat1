@@ -91,7 +91,7 @@ fun AttractionsScreen(navController: NavHostController) {
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(text = place.name, fontSize = 20.sp, color = Color.Blue)
                                     Text(text = place.location, fontSize = 16.sp)
-                                    Text(text = place.description, fontSize = 14.sp)
+
                                 }
                             }
                         }
