@@ -19,7 +19,7 @@
         android:networkSecurityConfig="@xml/network_security_config">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBvjFDeequGLXxgKrTzYF_tsPn5ojIV3BM"/>
+            android:value="use api_key for google map"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
